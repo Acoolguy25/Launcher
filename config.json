@@ -3,7 +3,10 @@
     "version": "v0.01",
     "split_files": {
         "Build\\UnityPlayer.dll": [
-            "Build\\UnityPlayer.dll.part1"
+            "Build\\UnityPlayer.dll.part1",
+            "Build\\UnityPlayer.dll.part2",
+            "Build\\UnityPlayer.dll.part3",
+            "Build\\UnityPlayer.dll.part4"
         ]
     }
 }

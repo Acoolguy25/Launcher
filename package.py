@@ -5,7 +5,7 @@ import git
 import sys
 import os
 
-max_file_size_bytes = 10 * 1024 * 1024 * 1024
+max_file_size_bytes = 10 * 1024 * 1024
 
 def bump_version(ver: str, mode: int = 0) -> str:
     match = re.match(r"v(\d+)\.(\d+)([a-z]?)$", ver)
