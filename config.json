@@ -1,4 +1,9 @@
 {
     "mode": "pre-release",
-    "version": "v0.01"
+    "version": "v0.01",
+    "split_files": {
+        "Build\\UnityPlayer.dll": [
+            "Build\\UnityPlayer.dll.part1"
+        ]
+    }
 }
