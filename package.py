@@ -1,7 +1,6 @@
 import re
 import json
 import subprocess
-import git
 import sys
 import os
 
@@ -35,13 +34,15 @@ def bump_version(ver: str, mode: int = 0) -> str:
     minor += 1
     return f"v{major}.{minor:02d}"
 
-def git_push_all(path=".", message="auto commit"):
-    repo = git.Repo(path)
+def git_push_all(message="auto commit"):
+    # stage everything
+    subprocess.run(["git", "add", "--all"], check=True)
 
-    repo.git.add(all=True)
-    repo.index.commit(message)
-    origin = repo.remote(name='origin')
-    origin.push()
+    # commit (won't fail if nothing to commit)
+    subprocess.run(["git", "commit", "-m", message], check=False)
+
+    # push
+    subprocess.run(["git", "push"], check=True)
 
 def split_file(input_file, splitFilesJSON):
     output_dir = os.path.dirname(input_file)
