@@ -1,6 +1,7 @@
 import re
 import json
 import subprocess
+import git
 import sys
 
 def bump_version(ver: str, mode: int = 0) -> str:
@@ -12,7 +13,7 @@ def bump_version(ver: str, mode: int = 0) -> str:
     major, minor = int(major), int(minor)
 
     # MODE 1 → remove suffix & bump number
-    if mode == 2:
+    if mode == 10:
         minor += 1
         return f"v{major}.{minor:02d}"
 
@@ -31,13 +32,21 @@ def bump_version(ver: str, mode: int = 0) -> str:
     minor += 1
     return f"v{major}.{minor:02d}"
 
+def git_push_all(path=".", message="auto commit"):
+    repo = git.Repo(path)
+
+    repo.git.add(all=True)
+    repo.index.commit(message)
+    origin = repo.remote(name='origin')
+    origin.push()
+
 
 configPath = "config.json"
 def main():
     file = json.load(open(configPath, 'r'))
     nextMode = 0
     try:
-        nextMode = int(sys.argv[0])
+        nextMode = int(sys.argv[1])
     except Exception as e:
         nextMode = 0
     if nextMode == 0:
@@ -45,8 +54,10 @@ def main():
     else:
         file["version"] = bump_version(file["version"], nextMode)
         print(f"Advancing to version {file["version"]}..")
-        json.dump(file, open(configPath, 'w'))
-
+        json.dump(file, open(configPath, 'w'), indent=4)
+    commitMessage = f"Version {file["version"]} Release"
+    print(f"Pushing with commitMessage \"{commitMessage}\"")
+    git_push_all(message=commitMessage)
 
 
 if __name__ == "__main__":
