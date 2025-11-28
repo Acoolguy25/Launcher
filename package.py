@@ -3,8 +3,10 @@ import json
 import subprocess
 import sys
 import os
+from pathlib import Path
 
 max_file_size_bytes = 10 * 1024 * 1024
+parentPath = Path(__file__).parent
 
 def bump_version(ver: str, mode: int = 0) -> str:
     match = re.match(r"v(\d+)\.(\d+)([a-z]?)$", ver)
@@ -65,6 +67,17 @@ def split_file(input_file, splitFilesJSON):
             print(f"Created: {part_file}")
             part_num += 1
 
+def calculate_file_size():
+    total_size = 0
+    for dirpath, _, filenames in os.walk(parentPath):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+
+    return total_size
+
 configPath = "config.json"
 def main():
     file = json.load(open(configPath, 'r'))
@@ -77,7 +90,7 @@ def main():
         nextMode = 0
     if nextMode == 0:
         print("Not incrementing version, proceeding to push...")
-    elif nextMode >= 0:
+    elif nextMode > 0:
         file["version"] = bump_version(file["version"], nextMode)
         print(f"Advancing to version {file["version"]}..")
     else:
@@ -85,6 +98,9 @@ def main():
 
     # Splitting Files
     split_file("Build/UnityPlayer.dll", file["split_files"])
+    sizeInBytes = calculate_file_size()
+    print(f"Total File Size: {calculate_file_size() / 1024 / 1024 :.1f} MB")
+    file["total_size"] = sizeInBytes
 
     json.dump(file, open(configPath, 'w'), indent=4)
 
